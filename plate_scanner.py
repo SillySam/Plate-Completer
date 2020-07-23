@@ -67,6 +67,7 @@ def expand_plate_range(plate):
 def match_prefix(patchy_plate):
     possible_prefixes = {}
     plate_start = patchy_plate[:3]
+    plates = get_plate_prefixes()
 
     if plate_start.replace('?','') != '': # anything unknown to find?
 
@@ -92,6 +93,9 @@ def match_prefix(patchy_plate):
                             possible_prefixes[year].append(prefix)
                         else:
                             possible_prefixes[year] = [prefix]
+    else: 
+        # no prefix, return all
+        possible_prefixes = plates
 
     return possible_prefixes
 
@@ -121,12 +125,13 @@ def generate_number_combos(plate_end):
 ''' Gathers prefix's and endings to create a list of possible plates '''
 def get_possible_plates(partial_plate):
     
-    prefixes = match_prefix(plate)
+    prefixes = match_prefix(plate) 
 
-    # Calculate how many numbers are at the end
-    prefix_length = 3 
-    if len(prefixes[list(prefixes.keys())[0]]) == 2:
-        prefix_length = 2
+    # Calculate how many letters at the start
+    prefix_length = 3
+    if len(prefixes) > 0:
+        if len(prefixes[list(prefixes)[0]][0]) == 2:
+            prefix_length = 2
 
     # Get ending and generate number combos
     end = plate[prefix_length:]
@@ -154,7 +159,6 @@ if __name__ == "__main__":
     print('[ NZ Plate Finder ]')
     print('[?] This tool does NOT support custom plates!\n')
 
-    plates = get_plate_prefixes() # Grab prefix's from JSON
     plate = input("Enter Plate (eg: E?T42?): ")
 
     possibilities = get_possible_plates(plate)
@@ -167,5 +171,11 @@ if __name__ == "__main__":
         print('If the plate is valid, please report an issue!')
         exit(1)
 
-    # Do something with these generated possible plates ...
+    # output
+    print("outputting", amount_of_possibilities, " possibilities")
+    print('saving to plates.txt')
+    file_ = open('plates.txt', 'w')
+    file_.write(str(possibilities))
+    file_.close()
 
+    # Do something with these generated possible plates ...
